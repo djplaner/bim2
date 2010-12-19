@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/bim2/db" VERSION="20101219" COMMENT="XMLDB file for Moodle mod/bim2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="bim2" COMMENT="Default comment for bim2, please edit me" NEXT="bim2_student_feeds">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Course bim2 activity belongs to" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances" PREVIOUS="course" NEXT="intro"/>
+        <FIELD NAME="intro" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the bim2 activity" PREVIOUS="name" NEXT="introformat"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)" PREVIOUS="intro" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="introformat" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="bim2_student_feeds" COMMENT="Information about each individual feed" PREVIOUS="bim2" NEXT="bim2_marking">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="bim2"/>
+        <FIELD NAME="bim2" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The id for the bim activity this feed is associated with" PREVIOUS="id" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Id of the user who owns the feed" PREVIOUS="bim2" NEXT="numentries"/>
+        <FIELD NAME="numentries" TYPE="int" LENGTH="6" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" COMMENT="The number of entries already stored by bim2 for this feed" PREVIOUS="userid" NEXT="lastpost"/>
+        <FIELD NAME="lastpost" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="The datetime at which the last post was updated/posted" PREVIOUS="numentries" NEXT="blogurl"/>
+        <FIELD NAME="blogurl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The url for the blog home page (assuming it is a blog)" PREVIOUS="lastpost" NEXT="feedurl"/>
+        <FIELD NAME="feedurl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="URL for the rss/atom etc feed for the blog" PREVIOUS="blogurl"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="bim2_marking" COMMENT="Hold marking and other details about individual student blog posts that have been allocated to a particular question (i.e. the post is the student's answer)" PREVIOUS="bim2_student_feeds" NEXT="bim2_questions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="bim2"/>
+        <FIELD NAME="bim2" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="id of the bim2 activity associated with this marking" PREVIOUS="id" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Owner of the post being marked" PREVIOUS="bim2" NEXT="marker"/>
+        <FIELD NAME="marker" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="user id of the person who marked the post" PREVIOUS="userid" NEXT="question"/>
+        <FIELD NAME="question" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="id of the bim question that this post is allocated to i.e. the post is meant to be an answer to this question" PREVIOUS="marker" NEXT="mark"/>
+        <FIELD NAME="mark" TYPE="number" LENGTH="4" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" DECIMALS="2" COMMENT="The score/mark awarded by the marker to this post" PREVIOUS="question" NEXT="status"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="12" NOTNULL="false" SEQUENCE="false" COMMENT="Reflect current status of the post.  Translation from an enum...current values are Submitted Marked Released Unallocated Suspended...the default is Unallocated" PREVIOUS="mark" NEXT="timemarked"/>
+        <FIELD NAME="timemarked" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="status" NEXT="timereleased"/>
+        <FIELD NAME="timereleased" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timemarked" NEXT="link"/>
+        <FIELD NAME="link" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The link for the original of the post" PREVIOUS="timereleased" NEXT="timepublished"/>
+        <FIELD NAME="timepublished" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="link" NEXT="title"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="of the post" PREVIOUS="timepublished" NEXT="post"/>
+        <FIELD NAME="post" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="The actual body of the post, the content" PREVIOUS="title" NEXT="comments"/>
+        <FIELD NAME="comments" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="Markers comments on the post" PREVIOUS="post"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="bim2_questions" COMMENT="List of questions associated with a bim2 activity, the questions student posts are meant to respond to" PREVIOUS="bim2_marking" NEXT="bim2_group_allocation">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="bim2"/>
+        <FIELD NAME="bim2" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="id of the bim activity for this question" PREVIOUS="id" NEXT="title"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" PREVIOUS="bim2" NEXT="body"/>
+        <FIELD NAME="body" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" COMMENT="The text of the question" PREVIOUS="title" NEXT="min_mark"/>
+        <FIELD NAME="min_mark" TYPE="number" LENGTH="4" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" DECIMALS="2" COMMENT="Recommended minimum mark to be awarded for an answer to this question" PREVIOUS="body" NEXT="max_mark"/>
+        <FIELD NAME="max_mark" TYPE="number" LENGTH="4" NOTNULL="false" UNSIGNED="false" DEFAULT="10" SEQUENCE="false" DECIMALS="2" COMMENT="Recommended maximum mark to be awarded for an answer to this question" PREVIOUS="min_mark"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="bim2_group_allocation" COMMENT="Specify which student groups are allocated to which markers" PREVIOUS="bim2_questions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="bim2"/>
+        <FIELD NAME="bim2" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The bim activity id that this allocation is associated with" PREVIOUS="id" NEXT="groupid"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="The id of the group being allocated" PREVIOUS="bim2" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="THe id of the marker allocated to the group" PREVIOUS="groupid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="group_marker"/>
+        <KEY NAME="group_marker" TYPE="unique" FIELDS="bim2, groupid, userid" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
